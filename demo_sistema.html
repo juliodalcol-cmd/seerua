@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Se essa rua fosse minha — Demonstração Comercial</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#3B6D11;--green-l:#EAF3DE;--green-m:#639922;--green-d:#27500A;
+  --amber:#BA7517;--amber-l:#FAEEDA;--amber-m:#EF9F27;
+  --teal:#1D9E75;--teal-l:#E1F5EE;
+  --coral:#D85A30;--coral-l:#FAECE7;
+  --purple:#534AB7;--purple-l:#EEEDFE;
+  --gray-l:#F1EFE8;--gray-d:#2C2C2A;
+  --surface:#fff;--bg:#f0ede6;
+  --border:#e0ddd6;--text:#1a1a18;--text2:#5F5E5A;--text3:#888780;
+  --sidebar:260px;--r:8px;--rl:12px;
+  --ff:'Nunito',sans-serif;--fft:'Fredoka One',cursive;
+}
+html,body{height:100%;background:var(--bg);font-family:var(--ff);color:var(--text);overflow:hidden}
+
+/* LAYOUT */
+.app{display:grid;grid-template-rows:54px 1fr;grid-template-columns:var(--sidebar) 1fr;height:100vh}
+
+/* TOPBAR */
+.topbar{grid-column:1/-1;background:var(--green);display:flex;align-items:center;padding:0 20px;gap:14px}
+.tb-logo{width:32px;height:32px;background:var(--amber-m);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.tb-title{font-family:var(--fft);font-size:17px;color:#fff}
+.tb-spacer{flex:1}
+.demo-badge{background:var(--amber);color:#fff;font-size:10px;font-weight:800;padding:4px 12px;border-radius:20px;letter-spacing:.5px}
+.tb-ctx{font-size:11px;color:#C0DD97;margin-left:4px}
+
+/* SIDEBAR */
+.sidebar{background:var(--green-d);display:flex;flex-direction:column;border-right:1px solid #1a2e08}
+.sidebar-top{padding:16px 16px 12px;border-bottom:1px solid rgba(255,255,255,.08)}
+.sidebar-title{font-family:var(--fft);font-size:14px;color:#C0DD97}
+.sidebar-sub{font-size:10px;color:#888780;margin-top:2px}
+.sidebar-sec-label{font-size:9px;font-weight:800;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:1px;padding:10px 16px 4px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 16px;font-size:13px;color:#B4B2A9;cursor:pointer;border:none;background:none;width:100%;text-align:left;font-family:var(--ff);border-left:3px solid transparent;transition:background .15s}
+.nav-item:hover{background:rgba(255,255,255,.07);color:#fff}
+.nav-item.active{background:rgba(255,255,255,.1);color:#C0DD97;font-weight:800;border-left-color:var(--green-m)}
+.nav-item.destaque{color:var(--amber-m)}
+.nav-item.destaque.active{border-left-color:var(--amber-m);color:var(--amber-m)}
+.nav-ic{font-size:16px;flex-shrink:0}
+.nav-sep{height:1px;background:rgba(255,255,255,.07);margin:6px 16px}
+.sidebar-demo-box{margin:12px 12px 0;background:rgba(239,159,39,.12);border:1px solid rgba(239,159,39,.3);border-radius:var(--r);padding:10px 12px;font-size:11px;color:var(--amber-m);line-height:1.5}
+.sidebar-demo-box strong{display:block;font-size:12px;margin-bottom:3px}
+
+/* MAIN */
+.main{overflow-y:auto;background:var(--bg)}
+.page{display:none;padding:28px 32px;min-height:100%}.page.active{display:block}
+.page-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;gap:16px}
+.page-title{font-family:var(--fft);font-size:24px}
+.page-sub{font-size:13px;color:var(--text2);margin-top:3px}
+.btn{background:var(--green);color:#fff;border:none;border-radius:var(--r);padding:9px 18px;font-family:var(--ff);font-size:13px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:opacity .15s}
+.btn:hover{opacity:.88}
+.btn.sec{background:var(--surface);color:var(--text);border:1px solid var(--border)}
+.btn.amber{background:var(--amber);color:#fff}
+.btn.big{font-size:16px;padding:13px 28px;font-family:var(--fft)}
+.btn.full{width:100%;justify-content:center}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.stat{background:var(--surface);border-radius:var(--rl);border:1px solid var(--border);padding:16px 18px;border-left:3px solid var(--green)}
+.stat.a{border-left-color:var(--amber)}.stat.t{border-left-color:var(--teal)}.stat.c{border-left-color:var(--coral)}
+.stat-l{font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px}
+.stat-v{font-family:var(--fft);font-size:30px;line-height:1}
+.stat-s{font-size:11px;color:var(--text3);margin-top:3px}
+
+/* TABELA RUAS */
+.table-wrap{background:var(--surface);border-radius:var(--rl);border:1px solid var(--border);overflow:hidden;margin-bottom:20px}
+.table-toolbar{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.t-search{padding:7px 12px;border:1px solid var(--border);border-radius:var(--r);font-family:var(--ff);font-size:13px;background:var(--bg);width:220px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{background:var(--bg);padding:9px 14px;text-align:left;font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;border-bottom:1px solid var(--border)}
+tbody td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:var(--bg)}
+.badge{font-size:10px;font-weight:800;padding:3px 9px;border-radius:20px;display:inline-block}
+.b-pub{background:var(--green-l);color:var(--green-d)}
+.b-draft{background:var(--amber-l);color:var(--amber)}
+.rbtn{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:5px 10px;font-size:11px;font-weight:700;color:var(--text2);cursor:pointer;font-family:var(--ff)}
+.rbtn:hover{color:var(--text)}
+
+/* WIZARD DEMO */
+.wizard-layout{display:grid;grid-template-columns:220px 1fr;gap:24px;align-items:start}
+.wizard-steps{position:sticky;top:0}
+.wstep{display:flex;align-items:center;gap:10px;padding:10px 0;position:relative}
+.wstep:not(:last-child)::after{content:'';position:absolute;left:13px;top:36px;width:2px;height:calc(100% - 10px);background:var(--border)}
+.wcircle{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;border:2px solid var(--border);background:var(--surface);color:var(--text3);flex-shrink:0;position:relative;z-index:1;transition:all .3s}
+.wcircle.done{background:var(--green);border-color:var(--green);color:#fff}
+.wcircle.active{background:var(--green-m);border-color:var(--green-m);color:#fff}
+.wlabel{font-size:12px;font-weight:700;color:var(--text3);transition:color .3s}
+.wlabel.active{color:var(--green);font-weight:800}
+.wlabel.done{color:var(--text2)}
+.wcontent{background:var(--surface);border-radius:var(--rl);border:1px solid var(--border);overflow:hidden}
+.wcontent-hdr{padding:18px 22px;border-bottom:1px solid var(--border);background:var(--bg)}
+.wcontent-title{font-family:var(--fft);font-size:18px}
+.wcontent-sub{font-size:12px;color:var(--text2);margin-top:3px}
+.wcontent-body{padding:22px}
+.wfoot{padding:16px 22px;border-top:1px solid var(--border);background:var(--bg);display:flex;gap:10px;justify-content:flex-end}
+.ws{display:none}.ws.active{display:block}
+
+/* FORM */
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.ff{margin-bottom:16px}.ff.full{grid-column:1/-1}
+.fl{font-size:11px;font-weight:800;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;display:block;margin-bottom:5px}
+.fi,.fta,.fsel{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--r);font-family:var(--ff);font-size:14px;color:var(--text);background:var(--surface);transition:border-color .15s}
+.fi:focus,.fta:focus,.fsel:focus{outline:none;border-color:var(--green)}
+.fta{min-height:110px;resize:vertical}
+
+/* QR RESULTADO */
+.qr-result-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+.qr-box{background:var(--green-l);border:2px solid var(--green-m);border-radius:var(--rl);padding:28px;text-align:center}
+.qr-box-label{font-size:11px;font-weight:800;color:var(--green-d);text-transform:uppercase;letter-spacing:.8px;margin-bottom:16px}
+.qr-canvas-wrap{display:flex;justify-content:center;margin-bottom:12px}
+.qr-street{font-family:var(--fft);font-size:17px;color:var(--green-d);margin-top:8px}
+.qr-city{font-size:12px;color:var(--green-m);margin-top:2px}
+.qr-url{font-size:10px;color:var(--green-d);margin-top:8px;word-break:break-all;opacity:.7;padding:0 8px}
+.qr-scan-hint{background:var(--amber);color:#fff;border-radius:20px;padding:6px 16px;font-size:12px;font-weight:800;margin-top:14px;display:inline-block;animation:hint-pulse 2s ease-in-out infinite}
+@keyframes hint-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.qr-dl-row{display:flex;gap:8px;justify-content:center;margin-top:12px}
+
+/* SUMÁRIO */
+.summary{background:var(--surface);border-radius:var(--rl);border:1px solid var(--border);overflow:hidden}
+.summary-hdr{background:var(--green);padding:14px 16px;font-family:var(--fft);font-size:16px;color:#fff}
+.summary-body{padding:4px 0}
+.srow{display:flex;justify-content:space-between;padding:8px 16px;border-bottom:1px solid var(--border);font-size:13px}
+.srow:last-child{border-bottom:none}
+.sk{color:var(--text2);font-weight:600}.sv{font-weight:800;text-align:right;max-width:55%;word-break:break-word}
+.success-banner{background:var(--green-l);border:1.5px solid var(--green-m);border-radius:var(--r);padding:12px 16px;margin-bottom:20px;font-size:13px;color:var(--green-d);font-weight:700;display:flex;align-items:center;gap:10px}
+
+/* DASHBOARD */
+.dash-welcome{background:linear-gradient(135deg,var(--green-d),var(--green));border-radius:var(--rl);padding:24px 28px;margin-bottom:22px;color:#fff;position:relative;overflow:hidden}
+.dash-welcome::after{content:'🗺';position:absolute;right:24px;top:50%;transform:translateY(-50%);font-size:64px;opacity:.15}
+.dash-welcome-title{font-family:var(--fft);font-size:22px;margin-bottom:4px}
+.dash-welcome-sub{font-size:13px;color:#C0DD97;line-height:1.5}
+.dash-cta{background:var(--amber);color:#fff;border:none;border-radius:var(--r);padding:10px 20px;font-family:var(--fft);font-size:16px;cursor:pointer;margin-top:14px;display:inline-block}
+
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:center;justify-content:center;padding:20px}
+.modal-bg.open{display:flex}
+.modal{background:var(--surface);border-radius:var(--rl);border:1px solid var(--border);width:100%;max-width:420px;overflow:hidden}
+.modal-hdr{background:var(--green);padding:16px 20px;display:flex;justify-content:space-between;align-items:flex-start}
+.modal-title{font-family:var(--fft);font-size:18px;color:#fff}
+.modal-sub{font-size:11px;color:#C0DD97;margin-top:2px}
+.modal-x{background:rgba(255,255,255,.2);border:none;border-radius:50%;width:28px;height:28px;color:#fff;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.modal-body{padding:20px}
+.modal-qr{display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:14px}
+.modal-qr-url{font-size:10px;color:var(--text3);text-align:center;word-break:break-all}
+.modal-footer{padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
+
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="tb-logo">🗺</div>
+    <div class="tb-title">Se essa rua fosse minha</div>
+    <span class="tb-ctx">Painel de demonstração comercial</span>
+    <div class="tb-spacer"></div>
+    <div class="demo-badge">DEMONSTRAÇÃO AO VIVO</div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="sidebar-title">Painel Município</div>
+      <div class="sidebar-sub">Piraí do Sul — PR</div>
+    </div>
+    <div class="sidebar-sec-label">Navegação</div>
+    <button class="nav-item active" id="nav-dashboard" onclick="goPage('dashboard',this)"><span class="nav-ic">🏠</span> Início</button>
+    <button class="nav-item" id="nav-ruas" onclick="goPage('ruas',this)"><span class="nav-ic">📍</span> Ruas / QR Codes</button>
+    <button class="nav-item" id="nav-alunos" onclick="goPage('alunos',this)"><span class="nav-ic">👥</span> Alunos</button>
+    <button class="nav-item" id="nav-contrib" onclick="goPage('contrib',this)"><span class="nav-ic">🔔</span> Contribuições</button>
+    <div class="nav-sep"></div>
+    <button class="nav-item destaque active" id="nav-demo" onclick="goPage('demo',this)"><span class="nav-ic">✨</span> Criar rua ao vivo</button>
+    <div class="sidebar-demo-box">
+      <strong>🎯 Demonstração interativa</strong>
+      Crie uma rua com seu nome e escaneie o QR Code com o celular agora mesmo.
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- DASHBOARD -->
+    <div class="page" id="page-dashboard">
+      <div class="dash-welcome">
+        <div class="dash-welcome-title">Bem-vindo ao painel — Piraí do Sul</div>
+        <div class="dash-welcome-sub">Gerencie logradouros, QR Codes, alunos e contribuições da comunidade.<br>Clique em "Criar rua ao vivo" para ver a demonstração interativa.</div>
+        <button class="dash-cta" onclick="goPage('demo',document.getElementById('nav-demo'))">✨ Criar rua ao vivo agora</button>
+      </div>
+      <div class="stats-row">
+        <div class="stat"><div class="stat-l">Ruas cadastradas</div><div class="stat-v" id="dashCount">4</div><div class="stat-s">QR Codes ativos</div></div>
+        <div class="stat a"><div class="stat-l">Selos coletados</div><div class="stat-v">47</div><div class="stat-s">esta semana</div></div>
+        <div class="stat t"><div class="stat-l">Alunos ativos</div><div class="stat-v">143</div><div class="stat-s">6 turmas</div></div>
+        <div class="stat c"><div class="stat-l">Contribuições</div><div class="stat-v">7</div><div class="stat-s">aguardando validação</div></div>
+      </div>
+      <div class="table-wrap">
+        <div class="table-toolbar"><div style="font-weight:800;font-size:14px">Últimas ruas cadastradas</div></div>
+        <table><thead><tr><th>Seq.</th><th>Nome</th><th>Homenageado</th><th>Status</th><th>Selos</th></tr></thead>
+        <tbody id="dashTable">
+          <tr><td>01</td><td>R. Cel. Dulcídio Pereira</td><td>Cel. Dulcídio Pereira</td><td><span class="badge b-pub">Publicado</span></td><td>18</td></tr>
+          <tr><td>02</td><td>R. Padre Augusto Schleder</td><td>Pe. Augusto Schleder</td><td><span class="badge b-pub">Publicado</span></td><td>14</td></tr>
+          <tr><td>03</td><td>R. Rio Verde</td><td>Denominação geográfica</td><td><span class="badge b-pub">Publicado</span></td><td>15</td></tr>
+          <tr><td>04</td><td>R. Pref. João Alves</td><td>João Alves da Silva</td><td><span class="badge b-draft">Rascunho</span></td><td>0</td></tr>
+        </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- RUAS -->
+    <div class="page" id="page-ruas">
+      <div class="page-hdr">
+        <div><div class="page-title">Ruas e QR Codes</div><div class="page-sub">Logradouros cadastrados no sistema</div></div>
+        <div style="display:flex;gap:8px"><button class="btn sec">⬇ Exportar</button><button class="btn" onclick="goPage('demo',document.getElementById('nav-demo'))">➕ Nova rua</button></div>
+      </div>
+      <div class="table-wrap">
+        <div class="table-toolbar"><input class="t-search" placeholder="Buscar..."><button class="btn sec">Filtrar</button></div>
+        <table><thead><tr><th>Seq.</th><th>Nome</th><th>Homenageado</th><th>Bairro</th><th>Status</th><th>Selos</th><th>Ações</th></tr></thead>
+        <tbody id="ruasTable">
+          <tr><td>01</td><td>R. Cel. Dulcídio Pereira</td><td>Cel. Dulcídio Pereira</td><td>Centro</td><td><span class="badge b-pub">Publicado</span></td><td>18</td><td><button class="rbtn" onclick="verQRModal('https://seerua.com.br/pirai-do-sul/cel-dulcidio-pereira','R. Cel. Dulcídio Pereira')">▦ QR</button></td></tr>
+          <tr><td>02</td><td>R. Padre Augusto Schleder</td><td>Pe. Augusto Schleder</td><td>Centro</td><td><span class="badge b-pub">Publicado</span></td><td>14</td><td><button class="rbtn" onclick="verQRModal('https://seerua.com.br/pirai-do-sul/pe-augusto-schleder','R. Pe. Augusto Schleder')">▦ QR</button></td></tr>
+          <tr><td>03</td><td>R. Rio Verde</td><td>Denominação geográfica</td><td>Centro</td><td><span class="badge b-pub">Publicado</span></td><td>15</td><td><button class="rbtn" onclick="verQRModal('https://seerua.com.br/pirai-do-sul/rio-verde','R. Rio Verde')">▦ QR</button></td></tr>
+          <tr><td>04</td><td>R. Pref. João Alves</td><td>João Alves da Silva</td><td>Centro</td><td><span class="badge b-draft">Rascunho</span></td><td>0</td><td><button class="rbtn" onclick="verQRModal('https://seerua.com.br/pirai-do-sul/pref-joao-alves','R. Pref. João Alves')">▦ QR</button></td></tr>
+        </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ALUNOS -->
+    <div class="page" id="page-alunos">
+      <div class="page-hdr"><div><div class="page-title">Alunos</div><div class="page-sub">143 alunos ativos em 6 turmas</div></div><button class="btn sec">⬇ Exportar</button></div>
+      <div class="table-wrap"><table><thead><tr><th>Aluno</th><th>Turma</th><th>Selos</th><th>Personagens</th><th>Último acesso</th></tr></thead>
+      <tbody>
+        <tr><td>Ana Beatriz Costa</td><td>6º A</td><td>3</td><td>2</td><td>Hoje, 09:14</td></tr>
+        <tr><td>Lucas Ferreira</td><td>6º B</td><td>5</td><td>3</td><td>Hoje, 08:50</td></tr>
+        <tr><td>Maria Clara Souza</td><td>7º A</td><td>8</td><td>4</td><td>Ontem, 14:30</td></tr>
+        <tr><td>Pedro Henrique Lima</td><td>7º B</td><td>2</td><td>1</td><td>28/05/2026</td></tr>
+      </tbody></table></div>
+    </div>
+
+    <!-- CONTRIBUIÇÕES -->
+    <div class="page" id="page-contrib">
+      <div class="page-hdr"><div><div class="page-title">Contribuições</div><div class="page-sub">Conteúdo da comunidade aguardando validação</div></div></div>
+      <div class="table-wrap"><table><thead><tr><th>Tipo</th><th>Logradouro</th><th>Enviado por</th><th>Data</th><th>Ações</th></tr></thead>
+      <tbody>
+        <tr><td>🖼 Foto</td><td>R. Cel. Dulcídio Pereira</td><td>José Pereira (familiar)</td><td>30/05/2026</td><td><button class="rbtn" style="color:var(--green)">✓ Aprovar</button> <button class="rbtn" style="color:var(--coral)">✕ Recusar</button></td></tr>
+        <tr><td>📄 Texto</td><td>R. Pe. Augusto Schleder</td><td>Maria Helena (moradora)</td><td>29/05/2026</td><td><button class="rbtn" style="color:var(--green)">✓ Aprovar</button> <button class="rbtn" style="color:var(--coral)">✕ Recusar</button></td></tr>
+      </tbody></table></div>
+    </div>
+
+    <!-- DEMO: CRIAR RUA AO VIVO -->
+    <div class="page active" id="page-demo">
+      <div class="page-hdr">
+        <div>
+          <div class="page-title">✨ Criar rua ao vivo</div>
+          <div class="page-sub">Preencha os dados, gere o QR Code e escaneie com o celular agora mesmo</div>
+        </div>
+      </div>
+
+      <div id="successBanner" style="display:none" class="success-banner">
+        ✅ Rua criada com sucesso! Role para baixo para escanear o QR Code com o celular.
+      </div>
+
+      <div class="wizard-layout">
+        <!-- Steps -->
+        <div class="wizard-steps">
+          <div class="wstep"><div class="wcircle active" id="wc1">1</div><div class="wlabel active" id="wl1">Dados do logradouro</div></div>
+          <div class="wstep"><div class="wcircle" id="wc2">2</div><div class="wlabel" id="wl2">Texto biográfico</div></div>
+          <div class="wstep"><div class="wcircle" id="wc3">3</div><div class="wlabel" id="wl3">QR Code gerado</div></div>
+        </div>
+
+        <!-- Conteúdo wizard -->
+        <div class="wcontent">
+
+          <!-- ETAPA 1 -->
+          <div class="ws active" id="ws1">
+            <div class="wcontent-hdr"><div class="wcontent-title">Dados do logradouro</div><div class="wcontent-sub">Informações oficiais da rua, praça ou prédio público</div></div>
+            <div class="wcontent-body">
+              <div class="fgrid">
+                <div class="ff"><label class="fl">Sequência</label><input class="fi" id="dSeq" type="number" value="5" min="1"></div>
+                <div class="ff"><label class="fl">Tipo</label><select class="fsel" id="dTipo"><option>Rua</option><option>Avenida</option><option>Praça</option><option>Prédio público</option></select></div>
+                <div class="ff full"><label class="fl">Nome oficial do logradouro</label><input class="fi" id="dNome" type="text" placeholder="ex: Rua José da Silva Santos" autofocus></div>
+                <div class="ff full"><label class="fl">Nome do homenageado</label><input class="fi" id="dHom" type="text" placeholder="ex: José da Silva Santos"></div>
+                <div class="ff"><label class="fl">Nascimento</label><input class="fi" id="dNasc" type="text" placeholder="ex: 1920"></div>
+                <div class="ff"><label class="fl">Falecimento</label><input class="fi" id="dFal" type="text" placeholder="ex: 1998"></div>
+                <div class="ff full"><label class="fl">Lei de nominação</label><input class="fi" id="dLei" type="text" placeholder="ex: Lei nº 320/2010"></div>
+              </div>
+            </div>
+            <div class="wfoot"><button class="btn" onclick="wNext(2)">Próximo: texto biográfico ›</button></div>
+          </div>
+
+          <!-- ETAPA 2 -->
+          <div class="ws" id="ws2">
+            <div class="wcontent-hdr"><div class="wcontent-title">Texto biográfico</div><div class="wcontent-sub">Este texto aparecerá na página pública ao escanear o QR Code</div></div>
+            <div class="wcontent-body">
+              <div class="fgrid">
+                <div class="ff full"><label class="fl">Biografia</label><textarea class="fta" id="dBio" rows="6" placeholder="Descreva quem foi o homenageado, sua importância para o município, principais contribuições..."></textarea></div>
+                <div class="ff"><label class="fl">Bairro</label><input class="fi" id="dBairro" type="text" value="Centro"></div>
+                <div class="ff"><label class="fl">Extensão aproximada</label><input class="fi" id="dExt" type="text" placeholder="ex: 350 metros"></div>
+                <div class="ff"><label class="fl">Município</label><input class="fi" id="dCidade" type="text" value="Piraí do Sul"></div>
+                <div class="ff"><label class="fl">Estado</label><input class="fi" id="dUF" type="text" value="PR"></div>
+              </div>
+            </div>
+            <div class="wfoot">
+              <button class="btn sec" onclick="wNext(1)">‹ Anterior</button>
+              <button class="btn amber" onclick="wNext(3)">Gerar QR Code ✨</button>
+            </div>
+          </div>
+
+          <!-- ETAPA 3: QR GERADO -->
+          <div class="ws" id="ws3">
+            <div class="wcontent-hdr"><div class="wcontent-title">QR Code gerado — escaneie agora!</div><div class="wcontent-sub">Aponte a câmera do celular para o QR Code e acesse a página ao vivo</div></div>
+            <div class="wcontent-body">
+              <div class="qr-result-grid">
+                <div class="qr-box">
+                  <div class="qr-box-label">📱 Escaneie com o celular</div>
+                  <div class="qr-canvas-wrap"><div id="demoQrCanvas"></div></div>
+                  <div class="qr-street" id="demoQrNome"></div>
+                  <div class="qr-city" id="demoQrCidade"></div>
+                  <div class="qr-url" id="demoQrUrl"></div>
+                  <div class="qr-scan-hint">📷 Aponte a câmera aqui</div>
+                  <div class="qr-dl-row">
+                    <button class="btn sec" onclick="copiarUrl()">📋 Copiar URL</button>
+                    <button class="btn" onclick="abrirPagina()">🌐 Abrir página</button>
+                  </div>
+                </div>
+                <div>
+                  <div class="summary">
+                    <div class="summary-hdr">Resumo da rua criada</div>
+                    <div class="summary-body" id="demoSummary"></div>
+                  </div>
+                  <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px">
+                    <button class="btn amber full" onclick="addToList()">✓ Salvar na lista de ruas</button>
+                    <button class="btn sec full" onclick="wNext(1)">➕ Criar outra rua</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL QR -->
+<div class="modal-bg" id="qrModal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div><div class="modal-title" id="mqTitle"></div><div class="modal-sub">QR Code para impressão</div></div>
+      <button class="modal-x" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-qr"><div id="mqCanvas"></div><div class="modal-qr-url" id="mqUrl"></div></div>
+    </div>
+    <div class="modal-footer"><button class="btn sec" onclick="closeModal()">Fechar</button><button class="btn amber" onclick="alert('Em produção: baixa PDF de alta resolução')">⬇ PDF alta res.</button></div>
+  </div>
+</div>
+
+<script>
+// ===== CONFIG =====
+// ATENÇÃO: após hospedar no GitHub Pages, substitua esta URL pela URL real do seu repositório
+// Exemplo: 'https://seuusuario.github.io/seerua'
+const BASE_URL = window.location.origin + window.location.pathname.replace('demo_sistema.html','');
+const DEMO_RUA_PAGE = BASE_URL + 'demo_rua.html';
+
+// ===== NAV =====
+function goPage(id, el) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  if(el) el.classList.add('active');
+}
+
+// ===== WIZARD =====
+let currentStep = 1;
+let savedUrl = '';
+
+function wNext(step) {
+  if(step===3) { generateQR(); }
+  currentStep = step;
+  document.querySelectorAll('.ws').forEach(w=>w.classList.remove('active'));
+  document.getElementById('ws'+step).classList.add('active');
+  for(let i=1;i<=3;i++){
+    const c=document.getElementById('wc'+i), l=document.getElementById('wl'+i);
+    c.className='wcircle'+(i<step?' done':i===step?' active':'');
+    l.className='wlabel'+(i===step?' active':i<step?' done':'');
+  }
+  if(step===1){ ['dNome','dHom','dNasc','dFal','dLei','dBio','dBairro','dExt'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; }); document.getElementById('dSeq').value=String(document.querySelectorAll('#ruasTable tr').length+1); document.getElementById('successBanner').style.display='none'; }
+}
+
+function slugify(str) {
+  return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+}
+
+function generateQR() {
+  const nome    = document.getElementById('dNome').value.trim() || 'Nova Rua';
+  const hom     = document.getElementById('dHom').value.trim() || '—';
+  const nasc    = document.getElementById('dNasc').value.trim();
+  const fal     = document.getElementById('dFal').value.trim();
+  const lei     = document.getElementById('dLei').value.trim();
+  const bio     = document.getElementById('dBio').value.trim();
+  const bairro  = document.getElementById('dBairro').value.trim() || 'Centro';
+  const ext     = document.getElementById('dExt').value.trim();
+  const cidade  = document.getElementById('dCidade').value.trim() || 'Piraí do Sul';
+  const uf      = document.getElementById('dUF').value.trim() || 'PR';
+  const seq     = document.getElementById('dSeq').value.trim() || '5';
+  const tipo    = document.getElementById('dTipo').value;
+
+  // Monta URL com todos os dados codificados
+  const params = new URLSearchParams({
+    nome, hom, nasc, fal, lei, bio, bairro, ext, cidade, uf, seq,
+    prox: 'Próxima rua na sequência',
+    proxdist: 'Veja o mapa no aplicativo'
+  });
+  const url = DEMO_RUA_PAGE + '?' + params.toString();
+  savedUrl = url;
+
+  // Gera QR Code
+  const wrap = document.getElementById('demoQrCanvas');
+  wrap.innerHTML = '';
+  new QRCode(wrap, {
+    text: url,
+    width: 180, height: 180,
+    colorDark: '#3B6D11', colorLight: '#ffffff',
+    correctLevel: QRCode.CorrectLevel.M
+  });
+
+  document.getElementById('demoQrNome').textContent = nome;
+  document.getElementById('demoQrCidade').textContent = cidade + ' — ' + uf;
+  const display = url.length > 70 ? url.substring(0,70)+'...' : url;
+  document.getElementById('demoQrUrl').textContent = display;
+
+  const per = nasc && fal ? `${nasc}–${fal}` : nasc || fal || '—';
+  document.getElementById('demoSummary').innerHTML = `
+    <div class="srow"><span class="sk">Tipo</span><span class="sv">${tipo}</span></div>
+    <div class="srow"><span class="sk">Nome oficial</span><span class="sv">${nome}</span></div>
+    <div class="srow"><span class="sk">Homenageado</span><span class="sv">${hom}</span></div>
+    ${per!=='—'?`<div class="srow"><span class="sk">Período</span><span class="sv">${per}</span></div>`:''}
+    ${lei?`<div class="srow"><span class="sk">Lei</span><span class="sv">${lei}</span></div>`:''}
+    <div class="srow"><span class="sk">Bairro</span><span class="sv">${bairro}</span></div>
+    ${ext?`<div class="srow"><span class="sk">Extensão</span><span class="sv">${ext}</span></div>`:''}
+    <div class="srow"><span class="sk">Município</span><span class="sv">${cidade}/${uf}</span></div>
+    <div class="srow"><span class="sk">Sequência</span><span class="sv">#${seq}</span></div>
+    <div class="srow"><span class="sk">QR Code</span><span class="sv" style="color:var(--green)">✓ Gerado</span></div>`;
+}
+
+function copiarUrl() {
+  if(!savedUrl) return;
+  navigator.clipboard.writeText(savedUrl).then(()=>alert('URL copiada! Cole no celular para testar.')).catch(()=>{ prompt('Copie a URL abaixo:', savedUrl); });
+}
+
+function abrirPagina() {
+  if(savedUrl) window.open(savedUrl, '_blank');
+}
+
+function addToList() {
+  const nome   = document.getElementById('dNome').value.trim() || 'Nova Rua';
+  const hom    = document.getElementById('dHom').value.trim() || '—';
+  const bairro = document.getElementById('dBairro').value.trim() || 'Centro';
+  const seq    = String(document.getElementById('dSeq').value).padStart(2,'0');
+
+  // Adiciona na tabela de ruas
+  const row = `<tr><td>${seq}</td><td>${nome}</td><td>${hom}</td><td>${bairro}</td><td><span class="badge b-pub">Publicado</span></td><td>0</td><td><button class="rbtn" onclick="verQRModal('${savedUrl}','${nome}')">▦ QR</button></td></tr>`;
+  document.getElementById('ruasTable').insertAdjacentHTML('beforeend', row);
+  // Adiciona no dashboard
+  const row2 = `<tr><td>${seq}</td><td>${nome}</td><td>${hom}</td><td><span class="badge b-pub">Publicado</span></td><td>0</td></tr>`;
+  document.getElementById('dashTable').insertAdjacentHTML('beforeend', row2);
+
+  const cnt = document.querySelectorAll('#ruasTable tr').length;
+  document.getElementById('dashCount').textContent = cnt;
+
+  document.getElementById('successBanner').style.display = 'flex';
+  goPage('ruas', document.getElementById('nav-ruas'));
+  setTimeout(()=>{ document.getElementById('successBanner').style.display='none'; }, 4000);
+}
+
+// ===== MODAL QR =====
+function verQRModal(url, nome) {
+  document.getElementById('mqTitle').textContent = nome;
+  const wrap = document.getElementById('mqCanvas'); wrap.innerHTML='';
+  new QRCode(wrap,{text:url,width:160,height:160,colorDark:'#3B6D11',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});
+  document.getElementById('mqUrl').textContent = url.length>60 ? url.substring(0,60)+'...' : url;
+  document.getElementById('qrModal').classList.add('open');
+}
+
+function closeModal() { document.getElementById('qrModal').classList.remove('open'); }
+document.getElementById('qrModal').addEventListener('click', e=>{ if(e.target===document.getElementById('qrModal')) closeModal(); });
+
+// Ativa demo por padrão
+goPage('demo', document.getElementById('nav-demo'));
+</script>
+</body>
+</html>
